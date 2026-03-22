@@ -1,10 +1,11 @@
 from django.db import models
 from django.conf import settings
+from django.utils.timezone import now
 
 class Instructor(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     full_time = models.BooleanField(default=True)
-    total_learners = models.IntegerField()
+    total_learners = models.IntegerField(default=0)
     def __str__(self):
         return self.user.username
 
@@ -13,13 +14,9 @@ class Learner(models.Model):
     STUDENT = 'std'
     DEVELOPER = 'dev'
     DATA_SCIENTIST = 'ds'
-    OCCUPATION_CHOICES = [
-        (STUDENT, 'Student'),
-        (DEVELOPER, 'Developer'),
-        (DATA_SCIENTIST, 'Data Scientist')
-    ]
-    occupation = models.CharField(null=False, max_length=20, choices=OCCUPATION_CHOICES, default=STUDENT)
-    social_link = models.URLField(max_length=200)
+    OCCUPATION_CHOICES = [(STUDENT, 'Student'), (DEVELOPER, 'Developer'), (DATA_SCIENTIST, 'Data Scientist')]
+    occupation = models.CharField(max_length=20, choices=OCCUPATION_CHOICES, default=STUDENT)
+    social_link = models.URLField(max_length=200, default="http://github.com")
     def __str__(self):
         return self.user.username
 
@@ -40,7 +37,7 @@ class Lesson(models.Model):
 class Enrollment(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    date_enrolled = models.DateField(auto_now_add=True)
+    date_enrolled = models.DateField(default=now)
 
 class Question(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
@@ -49,9 +46,7 @@ class Question(models.Model):
     def is_get_score(self, selected_ids):
         all_answers = self.choice_set.filter(is_correct=True).count()
         selected_correct = self.choice_set.filter(is_correct=True, id__in=selected_ids).count()
-        if all_answers == selected_correct:
-            return True
-        return False
+        return all_answers == selected_correct
 
 class Choice(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
