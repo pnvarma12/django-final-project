@@ -15,8 +15,10 @@ class QuestionAdmin(admin.ModelAdmin):
 class LessonAdmin(admin.ModelAdmin):
     list_display = ['title']
 
+# Register all models so they appear in the Admin Dashboard
 admin.site.register(Question, QuestionAdmin)
 admin.site.register(Choice)
 admin.site.register(Lesson, LessonAdmin)
 admin.site.register(Course)
+admin.site.register(Enrollment)
 admin.site.register(Submission)
